@@ -10,28 +10,185 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <dom-module id="my-view2">
   <template>
-    <style include="shared-styles">
+    <style include="shared-styles app-grid-style">
       :host {
         display: block;
 
         padding: 10px;
+
+        --app-grid-columns: 3;
+        --app-grid-item-height: 50%; 
+      }
+
+      ul {
+        list-style-type: none;
+        list-style-position:inside;
+        /*border: 0.25px solid black;  */
+        text-align: center;
+        padding: 0;
+        margin: 0;
+        color: black;
+      }
+
+      li {
+        list-style-position:inside;
+        border: 0.25px solid black;
+        text-align: center;
+        color: black;
+      }
+
+      label {
+        color: black;
       }
     </style>
 
     <div class="card">
-      <div class="circle">2</div>
-      <h1>View Two</h1>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.</p>
-      <p>Id nam odio natum malorum, tibique copiosae expetenda mel ea.Detracto suavitate repudiandae no eum. Id adhuc minim soluta nam.Id nam odio natum malorum, tibique copiosae expetenda mel ea.</p>
+      <h1>Statistics</h1>
+      <label>Total: {{TotalVotes}}</label>
+      <br /> <br>
+      <ul class="app-grid">
+        <li><strong>Flavour</strong></li>
+        <li><strong>Count</strong></li>
+        <li><strong>Percentage</strong></li>
+      </ul> 
+      <template is="dom-repeat" items="{{cupcakeStats}}">
+        <ul class="app-grid">
+          <li>{{item.flavour}}</li>
+          <li>{{item.voteCount}}</li>
+          <li>[[_calculateCupcakePercent(item.voteCount, TotalVotes)]] %</li>
+        </ul>
+      </template>
     </div>
   </template>
 
   <script>
+    (function() {
+      var cupcakeVoteList = [
+        {
+          flavour: 'Chocolate',
+          voteCount: 0
+          //votePercentage: 0
+        },
+        {
+          flavour: 'Vanilla',
+          voteCount: 0
+          //votePercentage: 0
+        },
+        {
+          flavour: 'Rainbow',
+          voteCount: 0
+          //votePercentage: 0
+        },
+        {
+          flavour: 'Lemon Meringue',
+          voteCount: 0
+          //votePercentage: 0
+        }
+      ];
+
+      var rawData = [
+        {
+          person: 'Person1',
+          flavour: 'Chocolate'
+        },
+        {
+          person: 'Person2',
+          flavour: 'Vanilla'
+        },
+        {
+          person: 'Person3',
+          flavour: 'Rainbow'
+        },
+        {
+          person: 'Person4',
+          flavour: 'Lemon Meringue'
+        },
+        {
+          person: 'Person5',
+          flavour: 'Lemon Meringue'
+        },
+        {
+          person: 'Person6',
+          flavour: 'Chocolate'
+        },
+        {
+          person: 'Person7',
+          flavour: 'Lemon Meringue'
+        },
+        {
+          person: 'Person8',
+          flavour: 'Rainbow'
+        },
+        {
+          person: 'Person9',
+          flavour: 'Chocolate'
+        },
+        {
+          person: 'Person10',
+          flavour: 'Rainbow'
+        },
+        {
+          person: 'Person11',
+          flavour: 'Vanilla'
+        },
+      ];
+    
     Polymer({
       is: 'my-view2',
+      properties: {
+        TotalVotes: {
+          type: Number,
+          value: function() { return rawData.length; },   //change this to get the length of the rawData array
+          notify: true
+        },
+        cupcakeStats: {
+          type: Array,
+          computed: 'countCupcakeVotes', //'calculateStats(cupcakeVoteList, TotalVotes)',
+          notify: true
+        }
+        
+      },
+
+      _calculateCupcakePercent: function (cupcakeVotes, totalCupcakeVotes) {
+        return (cupcakeVotes / totalCupcakeVotes) * 100;
+      },
+
+      countCupcakeVotes: function () {
+        for (var i = 0, cupcake; cupcake = this.rawData[i]; i ++)
+        {
+          console.log(cupcake+"");
+          if (cupcake.flavour == 'Chocolate')
+          {
+            this.set('cupcakeVoteList.0.voteCount', cupcakeVoteList[0].voteCount + 1);
+          }
+
+          else if (cupcake.flavour == 'Vanilla')
+          {
+            this.set('cupcakeVoteList.1.voteCount', cupcakeVoteList[1].voteCount + 1);
+          }
+
+          else if (cupcake.flavour == 'Rainbow')
+          {
+            this.set('cupcakeVoteList.2.voteCount', cupcakeVoteList[2].voteCount + 1);
+          }
+
+          else if (cupcake.flavour == 'Lemon Meringue')
+          {
+            this.set('cupcakeVoteList.3.voteCount', cupcakeVoteList[3].voteCount + 1);
+          }
+
+          else 
+          {
+
+          }
+          console.log(cupcake+"");
+        }
+      }
     });
+    })();
   </script>
 </dom-module>

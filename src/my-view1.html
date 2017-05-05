@@ -10,6 +10,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 
 <dom-module id="my-view1">
   <template>
@@ -22,10 +26,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <div class="card">
-      <div class="circle">1</div>
-      <h1>View One</h1>
-      <p>Ut labores minimum atomorum pro. Laudem tibique ut has.</p>
-      <p>Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Cu mei vide viris gloriatur, at populo eripuit sit.</p>
+      <h1>Cupcake Preference</h1>
+      <br />
+      <paper-input label="Name"></paper-input>
+
+      <paper-dropdown-menu label="Cupcake Flavour">
+        <paper-listbox class="dropdown-content">
+          <paper-item>Chocolate</paper-item>
+          <paper-item>Vanilla</paper-item>
+          <paper-item>Rainbow</paper-item>
+          <paper-item>Lemon Meringue</paper-item>
+        </paper-listbox>
+      </paper-dropdown-menu>
+      <br /> <br />
+      <paper-button raised>Save</paper-button>
     </div>
   </template>
 
