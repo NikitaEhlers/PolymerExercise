@@ -1,0 +1,88 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="cupcake-vote">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+
+      #txtName {
+        width: 206px;
+      }
+    </style>
+    <iron-ajax id="ajaxPost"
+               handle-as="json"
+               body='{{body}}'
+               method="POST"
+               content-type="application/json"
+               on-response="handlePost"></iron-ajax>
+
+    <div class="card">
+      <h1>Cupcake Preference</h1>
+      <br />
+      <paper-input label="Name" id="txtName" value="{{newCupcakeVote.PersonName}}"></paper-input>
+
+      <paper-dropdown-menu label="Cupcake Flavour">
+        <paper-listbox class="dropdown-content" attr-for-selected="flavour" selected="{{newCupcakeVote.Flavour}}">
+          <paper-item flavour="Chocolate">Chocolate</paper-item>
+          <paper-item flavour="Vanilla">Vanilla</paper-item>
+          <paper-item flavour="Rainbow">Rainbow</paper-item>
+          <paper-item flavour="Lemon Meringue">Lemon Meringue</paper-item>
+        </paper-listbox>
+      </paper-dropdown-menu>
+      <br /> <br />
+      <paper-button raised on-tap="handleTap">Save</paper-button>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'cupcake-vote',
+      properties: {
+        newCupcakeVote: {
+          type: Object,
+          value: {}
+        }
+      },
+      handleTap: function() {
+        var self = this;
+        self.$.ajaxPost.url = "http://localhost:12373/api/CupcakeVotes";
+        self.body = { "PersonName": this.newCupcakeVote.PersonName,
+                      "Flavour": this.newCupcakeVote.Flavour  
+                    }
+        self.$.ajaxPost.generateRequest();
+      },
+
+      handlePost: function (data) {
+        var self = this;
+        if (data.detail.status === 201)
+        {
+          alert("Vote saved");
+        }
+
+        else {
+          alert("Something went wrong");
+        }
+      }
+    });
+  </script>
+</dom-module>

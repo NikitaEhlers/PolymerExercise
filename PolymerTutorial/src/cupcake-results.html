@@ -1,0 +1,177 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/app-layout/app-grid/app-grid-style.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/google-chart/google-chart.html">
+
+<dom-module id="cupcake-results">
+  <template>
+    <style include="shared-styles app-grid-style">
+      :host {
+        display: block;
+
+        padding: 10px;
+
+        --app-grid-columns: 3;
+        --app-grid-item-height: 50%; 
+      }
+
+      ul {
+        list-style-type: none;
+        list-style-position:inside;
+        /*border: 0.25px solid black;  */
+        text-align: center;
+        padding: 0;
+        margin: 0;
+        color: black;
+      }
+
+      li {
+        list-style-position:inside;
+        border: 0.25px solid black;
+        text-align: center;
+        color: black;
+      }
+
+      label {
+        color: black;
+      }
+    </style>
+    
+    <iron-ajax auto
+               url = "http://localhost:12373/api/CupcakeVotes"
+               handle-as = "json"
+               on-response="handleGet"
+               ></iron-ajax>
+
+    <div class="card">
+      <h1>Results</h1>
+      <label>Total: {{TotalVotes}}</label>
+      <br /> <br>
+      <ul class="app-grid">
+        <li><strong>Flavour</strong></li>
+        <li><strong>Count</strong></li>
+        <li><strong>Percentage</strong></li>
+      </ul> 
+      <template is="dom-repeat" items="{{cupcakeStats}}">
+        <ul class="app-grid">
+          <li>{{item.flavour}}</li>
+          <li>{{item.voteCount}}</li>
+          <li>[[_calculateCupcakePercent(item.voteCount, TotalVotes)]] %</li>
+        </ul>
+      </template>
+      <br> <br>
+      <google-chart id="chart" type='pie' options='{ "title": "Distribution of Cupcake Votes" }' 
+                    cols='[{"label": "Cupcake Flavour", "type": "string"}, {"label": "Votes", "type": "number"}]' 
+                    rows$='{{chartRows}}'>
+                    </google-chart>
+    </div>
+  </template>
+
+  <script>
+    (function() {
+    Polymer({
+      is: 'cupcake-results',
+      properties: {
+        rawData: {
+          type: Array,
+          value: {},
+          notify: true
+        },
+        TotalVotes: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
+        
+        cupcakeStats: {
+          type: Array,
+          value: [
+        {
+          flavour: 'Chocolate',
+          voteCount: 0
+        },
+        {
+          flavour: 'Vanilla',
+          voteCount: 0
+        },
+        {
+          flavour: 'Rainbow',
+          voteCount: 0
+        },
+        {
+          flavour: 'Lemon Meringue',
+          voteCount: 0
+        }
+      ],
+          notify: true
+        },
+
+      chartRows: {
+        type: Array,
+        value: [],
+        notify: true
+      }
+        
+        
+      },
+
+      _calculateCupcakePercent: function (cupcakeVotes, totalCupcakeVotes) {
+        return Math.round((cupcakeVotes / totalCupcakeVotes) * 100);
+      },
+
+      handleGet: function (data) {
+        rawData = data.detail.response;
+
+        this.TotalVotes = rawData.length;
+
+        for (i = 0; i < rawData.length; i ++)
+        {
+          if (rawData[i].Flavour == 'Chocolate')
+          {
+            this.set('cupcakeStats.0.voteCount', this.cupcakeStats[0].voteCount + 1);
+          }
+
+          else if (rawData[i].Flavour == 'Vanilla')
+          {
+            this.set('cupcakeStats.1.voteCount', this.cupcakeStats[1].voteCount + 1);
+          }
+
+          else if (rawData[i].Flavour == 'Rainbow')
+          {
+            this.set('cupcakeStats.2.voteCount', this.cupcakeStats[2].voteCount + 1);
+          }
+
+          else if (rawData[i].Flavour == 'Lemon Meringue')
+          {
+            this.set('cupcakeStats.3.voteCount', this.cupcakeStats[3].voteCount + 1);
+          }
+
+          else {
+
+          }
+
+      }
+
+      console.log(this.cupcakeStats);
+
+      this.push([this.cupcakeStats[0].flavour, this.cupcakeStats[0].voteCount]);
+      this.push([this.cupcakeStats[1].flavour, this.cupcakeStats[1].voteCount]);
+
+      console.log(this.chartRows);
+    }
+    });
+
+    })();
+  </script>
+</dom-module>
