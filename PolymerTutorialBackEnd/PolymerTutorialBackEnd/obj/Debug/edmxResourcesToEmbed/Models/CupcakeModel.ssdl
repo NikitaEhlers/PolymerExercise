@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="PolymerTutorialModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="CupcakeVotes">
+    <Key>
+      <PropertyRef Name="VoteID" />
+    </Key>
+    <Property Name="VoteID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="PersonName" Type="varchar" MaxLength="50" />
+    <Property Name="Flavour" Type="varchar" MaxLength="20" />
+  </EntityType>
+  <EntityContainer Name="PolymerTutorialModelStoreContainer">
+    <EntitySet Name="CupcakeVotes" EntityType="Self.CupcakeVotes" Schema="dbo" store:Type="Tables" />
+  </EntityContainer>
+</Schema>
