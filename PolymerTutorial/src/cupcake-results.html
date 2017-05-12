@@ -46,6 +46,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       label {
         color: black;
       }
+
+      #chart {
+        height: 400px;
+        width: 500px;
+      }
     </style>
     
     <iron-ajax auto
@@ -73,7 +78,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <br> <br>
       <google-chart id="chart" type='pie' options='{ "title": "Distribution of Cupcake Votes" }' 
                     cols='[{"label": "Cupcake Flavour", "type": "string"}, {"label": "Votes", "type": "number"}]' 
-                    rows$='{{chartRows}}'>
+                    rows='{{chartRows}}'>
                     </google-chart>
     </div>
   </template>
@@ -165,8 +170,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       console.log(this.cupcakeStats);
 
-      this.push([this.cupcakeStats[0].flavour, this.cupcakeStats[0].voteCount]);
-      this.push([this.cupcakeStats[1].flavour, this.cupcakeStats[1].voteCount]);
+      this.push("chartRows", [this.cupcakeStats[0].flavour, this.cupcakeStats[0].voteCount]);
+      this.push("chartRows", [this.cupcakeStats[1].flavour, this.cupcakeStats[1].voteCount]);
+      this.push("chartRows", [this.cupcakeStats[2].flavour, this.cupcakeStats[2].voteCount]);
+      this.push("chartRows", [this.cupcakeStats[3].flavour, this.cupcakeStats[3].voteCount]);
 
       console.log(this.chartRows);
     }
