@@ -13,7 +13,7 @@ using System.Web.Http.Cors;
 
 namespace PolymerTutorialBackEnd.Controllers
 {
-    [EnableCors(origins: "http://localhost:8000", headers: "*", methods: "*")]
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class CupcakeVotesController : ApiController
     {
         private CupcakeEntities db = new CupcakeEntities();

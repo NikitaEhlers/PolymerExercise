@@ -17,5 +17,6 @@ namespace PolymerTutorialBackEnd.Models
         public int VoteID { get; set; }
         public string PersonName { get; set; }
         public string Flavour { get; set; }
+        public string Suggestions { get; set; }
     }
 }

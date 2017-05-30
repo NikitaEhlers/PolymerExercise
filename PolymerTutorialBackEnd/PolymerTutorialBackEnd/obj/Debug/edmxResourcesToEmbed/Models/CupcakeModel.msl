@@ -7,6 +7,7 @@
           <ScalarProperty Name="VoteID" ColumnName="VoteID" />
           <ScalarProperty Name="PersonName" ColumnName="PersonName" />
           <ScalarProperty Name="Flavour" ColumnName="Flavour" />
+          <ScalarProperty Name="Suggestions" ColumnName="Suggestions" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

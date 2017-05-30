@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="dcffed99c41e4131b845a3580f0dca04" Name="Diagram1">
+      <Diagram DiagramId="973e581c7cd34f94bedbb1489873e2af" Name="Diagram1">
         <EntityTypeShape EntityType="PolymerTutorialModel.CupcakeVotes" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
       </Diagram>
     </edmx:Diagrams>

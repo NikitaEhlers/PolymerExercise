@@ -15,6 +15,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
 
 <dom-module id="cupcake-vote">
   <template>
@@ -28,6 +30,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #txtName {
         width: 206px;
       }
+
+      #toastSuccess {
+        --paper-toast-background-color: green;
+      }
+
+      #toastError {
+        --paper-toast-background-color: red;
+        --paper-toast-color: white;
+      }
     </style>
     <iron-ajax id="ajaxPost"
                handle-as="json"
@@ -35,8 +46,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                method="POST"
                content-type="application/json"
                on-response="handlePost"></iron-ajax>
-
+<br> 
     <div class="card">
+      <div id="toastContainer" style="position: fixed; top: 60px; right: 10px; width: 30%;">
+        <!--<paper-button on-tap="openToast">Test Success Toast</paper-button>-->
+      </div>
+      <paper-toast id="toastSuccess" class="fit-bottom" text="Vote saved"></paper-toast>
+      <paper-toast id="toastError" class="fit-bottom" text="Unable to save vote"></paper-toast>
+      
       <h1>Cupcake Preference</h1>
       <br />
       <paper-input label="Name" id="txtName" value="{{newCupcakeVote.PersonName}}"></paper-input>
@@ -44,13 +61,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <paper-dropdown-menu label="Cupcake Flavour">
         <paper-listbox class="dropdown-content" attr-for-selected="flavour" selected="{{newCupcakeVote.Flavour}}">
           <paper-item flavour="Chocolate">Chocolate</paper-item>
-          <paper-item flavour="Vanilla">Vanilla</paper-item>
-          <paper-item flavour="Rainbow">Rainbow</paper-item>
           <paper-item flavour="Lemon Meringue">Lemon Meringue</paper-item>
+          <paper-item flavour="Rainbow">Rainbow</paper-item>
+          <paper-item flavour="Vanilla">Vanilla</paper-item>
         </paper-listbox>
       </paper-dropdown-menu>
+
+      <paper-textarea label="Suggestions (Optional)" value="{{newCupcakeVote.Suggestions}}"></paper-textarea>
       <br /> <br />
-      <paper-button raised on-tap="handleTap">Save</paper-button>
+      <paper-button id="saveButton" raised on-tap="handleTap">Save</paper-button>
     </div>
   </template>
 
@@ -64,23 +83,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       },
       handleTap: function() {
-        var self = this;
-        self.$.ajaxPost.url = "http://localhost:12373/api/CupcakeVotes";
-        self.body = { "PersonName": this.newCupcakeVote.PersonName,
-                      "Flavour": this.newCupcakeVote.Flavour  
+        this.$.ajaxPost.url = "http://localhost:12373/api/CupcakeVotes";
+        this.body = { "PersonName": this.newCupcakeVote.PersonName,
+                      "Flavour": this.newCupcakeVote.Flavour,
+                      "Suggestions": this.newCupcakeVote.Suggestions
                     }
-        self.$.ajaxPost.generateRequest();
+        this.$.ajaxPost.generateRequest();
+      },
+
+      openToast: function() {
+        this.$.toastError.fitInto = this.$.toastContainer;
+        this.$.toastError.open();
       },
 
       handlePost: function (data) {
-        var self = this;
-        if (data.detail.status === 201)
-        {
-          alert("Vote saved");
+        if (data.detail.status === 201) {
+          this.$.toastSuccess.fitInto = this.$.toastContainer;
+          this.$.toastSuccess.open();
+          this.newCupcakeVote = {};
         }
 
         else {
-          alert("Something went wrong");
+          this.$.toastError.fitInto = this.$.toastContainer;
+          this.$.toastError.open();
         }
       }
     });

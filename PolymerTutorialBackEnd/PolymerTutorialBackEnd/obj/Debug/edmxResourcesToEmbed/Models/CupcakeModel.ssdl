@@ -7,6 +7,7 @@
     <Property Name="VoteID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="PersonName" Type="varchar" MaxLength="50" />
     <Property Name="Flavour" Type="varchar" MaxLength="20" />
+    <Property Name="Suggestions" Type="varchar(max)" />
   </EntityType>
   <EntityContainer Name="PolymerTutorialModelStoreContainer">
     <EntitySet Name="CupcakeVotes" EntityType="Self.CupcakeVotes" Schema="dbo" store:Type="Tables" />

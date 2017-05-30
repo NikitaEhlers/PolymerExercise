@@ -29,7 +29,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       ul {
         list-style-type: none;
         list-style-position:inside;
-        /*border: 0.25px solid black;  */
         text-align: center;
         padding: 0;
         margin: 0;
@@ -51,17 +50,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         height: 400px;
         width: 500px;
       }
+
+      table {
+        color: black;
+      }
     </style>
     
-    <iron-ajax auto
+    <iron-ajax id = "getVoteResults"
                url = "http://localhost:12373/api/CupcakeVotes"
                handle-as = "json"
-               on-response="handleGet"
-               ></iron-ajax>
+               on-response="handleGet"></iron-ajax>
 
     <div class="card">
+
       <h1>Results</h1>
-      <label>Total: {{TotalVotes}}</label>
+      <label>Total: {{totalVotes}}</label>
+      <br>
+      <label>Popular Choice: {{popularChoice}}</label>
       <br /> <br>
       <ul class="app-grid">
         <li><strong>Flavour</strong></li>
@@ -72,113 +77,157 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <ul class="app-grid">
           <li>{{item.flavour}}</li>
           <li>{{item.voteCount}}</li>
-          <li>[[_calculateCupcakePercent(item.voteCount, TotalVotes)]] %</li>
+          <li>[[_calculateCupcakePercent(item.voteCount, totalVotes)]] %</li>
         </ul>
       </template>
       <br> <br>
       <google-chart id="chart" type='pie' options='{ "title": "Distribution of Cupcake Votes" }' 
                     cols='[{"label": "Cupcake Flavour", "type": "string"}, {"label": "Votes", "type": "number"}]' 
-                    rows='{{chartRows}}'>
-                    </google-chart>
+                    rows='{{chartRows}}'></google-chart>
+
+      <br>
+      <table>
+        <tr><th>Suggestions</th></tr>
+      <template is="dom-repeat" items="{{suggestions}}">
+        <tr>
+          <td>{{item}}</td>
+        </tr>
+      </template>
+      </table>
     </div>
   </template>
 
   <script>
-    (function() {
     Polymer({
-      is: 'cupcake-results',
-      properties: {
-        rawData: {
-          type: Array,
-          value: {},
-          notify: true
+        is: 'cupcake-results',
+        properties: {
+          rawData: {
+            type: Array,
+            value: {},
+            notify: true
+          },
+          totalVotes: {
+            type: Number,
+            value: 0,
+            notify: true
+          },
+          cupcakeStats: {
+            type: Array,
+            value: [],
+            notify: true
+          },
+          chartRows: {
+            type: Array,
+            value: [],
+            notify: true
+          },
+          active: {
+            type: Boolean,
+            value: false,
+            observer: '_activeChanged'
+          },
+          suggestions: {
+            type: Array,
+            value: [],
+            notify: true
+          },
+          popularChoice: {
+            type: String,
+            value: "",
+            notify: true
+          }
         },
-        TotalVotes: {
-          type: Number,
-          value: 0,
-          notify: true
+
+        _calculateCupcakePercent: function (cupcakeVotes, totalCupcakeVotes) {
+          return Math.round((cupcakeVotes / totalCupcakeVotes) * 100);
         },
-        
-        cupcakeStats: {
-          type: Array,
-          value: [
-        {
-          flavour: 'Chocolate',
-          voteCount: 0
+
+        handleGet: function (data) {
+          //set received data
+          rawData = data.detail.response;
+          //reset calculated variables
+          this.totalVotes = 0;
+          this.cupcakeStats = [];
+          this.totalVotes = rawData.length;
+          
+          //set up required variables
+          var highestVoteCount = 0;
+          var self = this;
+
+          this.createSuggestionList();
+
+          //Do the count calculation as well as creating object
+          rawData.forEach(function (vote) {
+            var exists = false;
+            //loop existing object and check if it exists
+            for (var i = 0; i < self.cupcakeStats.length; i++) {
+              if (vote.Flavour === self.cupcakeStats[i].flavour) {
+                this.set('cupcakeStats.' + i + '.voteCount', self.cupcakeStats[i].voteCount + 1);
+                exists = true;
+              }
+
+              //checking the highest
+              if (self.cupcakeStats[i].voteCount > highestVoteCount) {
+                this.popularChoice = self.cupcakeStats[i].flavour;
+                highestVoteCount = self.cupcakeStats[i].voteCount;
+              }
+            }
+            //adding new value(flavour) if it doesn't already exist
+            if (!exists) {
+              this.push("cupcakeStats", { flavour: vote.Flavour, voteCount: 1 });
+            }
+
+            //add suggestion to it's own list
+            
+
+          }, this);
+
+          //sorting the list after it is done being created and counted
+          this.sortCupcakeStats();
+
+          //empty and re-populate the chartRows so chart updates
+          this.populateChart();
         },
-        {
-          flavour: 'Vanilla',
-          voteCount: 0
+
+        sortCupcakeStats: function () {
+          this.cupcakeStats.sort(function (a, b) {
+            var flavourA = a.flavour.toUpperCase();
+            var flavourB = b.flavour.toUpperCase();
+            if (flavourA < flavourB) {
+              return -1;
+            }
+
+            if (flavourA > flavourB) {
+              return 1;
+            }
+
+            return 0;
+          });
         },
-        {
-          flavour: 'Rainbow',
-          voteCount: 0
+
+        populateChart: function () {
+          this.chartRows = [];
+          var self = this;
+          this.cupcakeStats.forEach(function (cupcake) {
+            self.push("chartRows", [cupcake.flavour, cupcake.voteCount]);
+          });
         },
-        {
-          flavour: 'Lemon Meringue',
-          voteCount: 0
+
+        createSuggestionList: function() {
+          this.suggestions = [];
+          var self = this;
+          rawData.forEach(function (vote) {
+            if (vote.Suggestions != null) {
+              self.push("suggestions", vote.Suggestions);
+            }
+          });
+        },
+
+        _activeChanged: function (newValue, oldValue) {
+          if (newValue) {
+            this.$.getVoteResults.generateRequest();
+          }
         }
-      ],
-          notify: true
-        },
-
-      chartRows: {
-        type: Array,
-        value: [],
-        notify: true
-      }
-        
-        
-      },
-
-      _calculateCupcakePercent: function (cupcakeVotes, totalCupcakeVotes) {
-        return Math.round((cupcakeVotes / totalCupcakeVotes) * 100);
-      },
-
-      handleGet: function (data) {
-        rawData = data.detail.response;
-
-        this.TotalVotes = rawData.length;
-
-        for (i = 0; i < rawData.length; i ++)
-        {
-          if (rawData[i].Flavour == 'Chocolate')
-          {
-            this.set('cupcakeStats.0.voteCount', this.cupcakeStats[0].voteCount + 1);
-          }
-
-          else if (rawData[i].Flavour == 'Vanilla')
-          {
-            this.set('cupcakeStats.1.voteCount', this.cupcakeStats[1].voteCount + 1);
-          }
-
-          else if (rawData[i].Flavour == 'Rainbow')
-          {
-            this.set('cupcakeStats.2.voteCount', this.cupcakeStats[2].voteCount + 1);
-          }
-
-          else if (rawData[i].Flavour == 'Lemon Meringue')
-          {
-            this.set('cupcakeStats.3.voteCount', this.cupcakeStats[3].voteCount + 1);
-          }
-
-          else {
-
-          }
-
-      }
-
-      console.log(this.cupcakeStats);
-
-      this.push("chartRows", [this.cupcakeStats[0].flavour, this.cupcakeStats[0].voteCount]);
-      this.push("chartRows", [this.cupcakeStats[1].flavour, this.cupcakeStats[1].voteCount]);
-      this.push("chartRows", [this.cupcakeStats[2].flavour, this.cupcakeStats[2].voteCount]);
-      this.push("chartRows", [this.cupcakeStats[3].flavour, this.cupcakeStats[3].voteCount]);
-
-      console.log(this.chartRows);
-    }
-    });
-
-    })();
+      });
   </script>
 </dom-module>
